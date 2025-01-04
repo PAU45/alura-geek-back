@@ -1,5 +1,4 @@
-// filepath: /home/paulin/Documents/api/src/db.js
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const config = require('./utils/config');
 
 const connection = mysql.createConnection({

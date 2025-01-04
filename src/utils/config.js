@@ -1,11 +1,9 @@
 module.exports = {
-    appName: 'alura geek',
-    version: '1.0.0',
     db: {
         host: 'localhost',
         user: 'root',
-        password: '',
-        database: 'alura_geek'
+        password: '', // Asegúrate de que esta contraseña sea correcta
+        database: 'tienda_alura'
     },
     server: {
         port: 3000

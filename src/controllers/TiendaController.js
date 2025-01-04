@@ -1,21 +1,29 @@
-const products = require('../models/Producto');
+const Product = require('../models/Producto');
 
 // Obtener todos los productos
 exports.getAllProducts = (req, res) => {
-    res.send(products);
+    Product.getAllProducts((err, results) => {
+        if (err) {
+            res.status(500).send('Error retrieving products');
+            return;
+        }
+        res.send(results);
+    });
 };
 
 // Obtener un producto por ID
 exports.getProductById = (req, res) => {
-    const product = products.find(p => p.id === parseInt(req.params.id));
-    if (!product) {
-        res.status(404).send('El producto con el ID proporcionado no fue encontrado');
-        return;
-    }
-    res.send(product);
+    const productId = parseInt(req.params.id);
+    Product.getProductById(productId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error retrieving product');
+            return;
+        }
+        res.send(result);
+    });
 };
 
-// Crear un nuevo producto
+// Agregar un nuevo producto
 exports.createProduct = (req, res) => {
     const { name, price, description } = req.body;
     if (!name || !price || !description) {
@@ -23,51 +31,39 @@ exports.createProduct = (req, res) => {
         return;
     }
 
-    const newProduct = {
-        id: products.length + 1,
-        name,
-        price,
-        description
-    };
-
-    products.push(newProduct);
-    res.send(newProduct);
+    const newProduct = { name, price, description };
+    Product.createProduct(newProduct, (err, result) => {
+        if (err) {
+            res.status(500).send('Error creating product');
+            return;
+        }
+        res.send(result);
+    });
 };
 
-// Crear un nuevo pedido
-exports.createOrder = (req, res) => {
-    const { customerId, productId, quantity } = req.body;
-    if (!customerId || !productId || !quantity) {
-        res.status(400).send('Customer ID, Product ID y Quantity son requeridos');
-        return;
-    }
+// Actualizar un producto existente
+exports.updateProduct = (req, res) => {
+    const productId = parseInt(req.params.id);
+    const { name, price, description } = req.body;
+    const updatedProduct = { name, price, description };
 
-    const newOrder = {
-        id: orders.length + 1,
-        customerId,
-        productId,
-        quantity,
-        date: new Date().toISOString().split('T')[0]
-    };
-
-    orders.push(newOrder);
-    res.send(newOrder);
+    Product.updateProduct(productId, updatedProduct, (err, result) => {
+        if (err) {
+            res.status(500).send('Error updating product');
+            return;
+        }
+        res.send(result);
+    });
 };
 
-// Crear un nuevo cliente
-exports.createCustomer = (req, res) => {
-    const { name, email } = req.body;
-    if (!name || !email) {
-        res.status(400).send('Nombre y email son requeridos');
-        return;
-    }
-
-    const newCustomer = {
-        id: customers.length + 1,
-        name,
-        email
-    };
-
-    customers.push(newCustomer);
-    res.send(newCustomer);
+// Eliminar un producto
+exports.deleteProduct = (req, res) => {
+    const productId = parseInt(req.params.id);
+    Product.deleteProduct(productId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error deleting product');
+            return;
+        }
+        res.send(result);
+    });
 };

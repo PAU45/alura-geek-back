@@ -1,20 +1,28 @@
-const products = require('../models/Producto');
-const orders = require('../models/orden');
-const customers = require('../models/usuarios');
+const Product = require('../models/Producto');
+const Order = require('../models/Orden');
+const Customer = require('../models/Usuarios');
 
 // Obtener todos los productos
 exports.getAllProducts = (req, res) => {
-    res.send(products);
+    Product.getAllProducts((err, results) => {
+        if (err) {
+            res.status(500).send('Error retrieving products');
+            return;
+        }
+        res.send(results);
+    });
 };
 
 // Obtener un producto por ID
 exports.getProductById = (req, res) => {
-    const product = products.find(p => p.id === parseInt(req.params.id));
-    if (!product) {
-        res.status(404).send('El producto con el ID proporcionado no fue encontrado');
-        return;
-    }
-    res.send(product);
+    const productId = parseInt(req.params.id);
+    Product.getProductById(productId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error retrieving product');
+            return;
+        }
+        res.send(result);
+    });
 };
 
 // Agregar un nuevo producto
@@ -25,71 +33,85 @@ exports.createProduct = (req, res) => {
         return;
     }
 
-    const newProduct = {
-        id: products.length + 1,
-        name,
-        price,
-        description
-    };
-
-    products.push(newProduct);
-    res.send(newProduct);
+    const newProduct = { name, price, description };
+    Product.createProduct(newProduct, (err, result) => {
+        if (err) {
+            res.status(500).send('Error creating product');
+            return;
+        }
+        res.send(result);
+    });
 };
 
 // Actualizar un producto existente
 exports.updateProduct = (req, res) => {
-    const product = products.find(p => p.id === parseInt(req.params.id));
-    if (!product) {
-        res.status(404).send('El producto con el ID proporcionado no fue encontrado');
-        return;
-    }
-
+    const productId = parseInt(req.params.id);
     const { name, price, description } = req.body;
-    if (name) product.name = name;
-    if (price) product.price = price;
-    if (description) product.description = description;
+    const updatedProduct = { name, price, description };
 
-    res.send(product);
+    Product.updateProduct(productId, updatedProduct, (err, result) => {
+        if (err) {
+            res.status(500).send('Error updating product');
+            return;
+        }
+        res.send(result);
+    });
 };
 
 // Eliminar un producto
 exports.deleteProduct = (req, res) => {
-    const productIndex = products.findIndex(p => p.id === parseInt(req.params.id));
-    if (productIndex === -1) {
-        res.status(404).send('El producto con el ID proporcionado no fue encontrado');
-        return;
-    }
-
-    const deletedProduct = products.splice(productIndex, 1);
-    res.send(deletedProduct);
+    const productId = parseInt(req.params.id);
+    Product.deleteProduct(productId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error deleting product');
+            return;
+        }
+        res.send(result);
+    });
 };
 
 // Obtener todos los pedidos
 exports.getAllOrders = (req, res) => {
-    res.send(orders);
+    Order.getAllOrders((err, results) => {
+        if (err) {
+            res.status(500).send('Error retrieving orders');
+            return;
+        }
+        res.send(results);
+    });
 };
 
 // Obtener un pedido por ID
 exports.getOrderById = (req, res) => {
-    const order = orders.find(o => o.id === parseInt(req.params.id));
-    if (!order) {
-        res.status(404).send('El pedido con el ID proporcionado no fue encontrado');
-        return;
-    }
-    res.send(order);
+    const orderId = parseInt(req.params.id);
+    Order.getOrderById(orderId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error retrieving order');
+            return;
+        }
+        res.send(result);
+    });
 };
 
 // Obtener todos los clientes
 exports.getAllCustomers = (req, res) => {
-    res.send(customers);
+    Customer.getAllCustomers((err, results) => {
+        if (err) {
+            res.status(500).send('Error retrieving customers');
+            return;
+        }
+        res.send(results);
+    });
 };
 
 // Obtener un cliente por ID
 exports.getCustomerById = (req, res) => {
-    const customer = customers.find(c => c.id === parseInt(req.params.id));
-    if (!customer) {
-        res.status(404).send('El cliente con el ID proporcionado no fue encontrado');
-        return;
-    }
-    res.send(customer);
+    const customerId = parseInt(req.params.id);
+    Customer.getCustomerById(customerId, (err, result) => {
+        if (err) {
+            res.status(500).send('Error retrieving customer');
+            return;
+        }
+        res.send(result);
+    });
 };

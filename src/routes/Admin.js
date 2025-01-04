@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const adminController = require('../controllers/AdmindController');
+const adminController = require('../controllers/AdmindController'); // Asegúrate de que la ruta de importación sea correcta
 
 // Rutas para productos
 router.get('/products', adminController.getAllProducts);

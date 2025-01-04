@@ -1,7 +1,54 @@
-const products = [
-    { id: 1, name: 'Product 1', price: 100, description: 'Description of Product 1' },
-    { id: 2, name: 'Product 2', price: 200, description: 'Description of Product 2' },
-    { id: 3, name: 'Product 3', price: 300, description: 'Description of Product 3' }
-];
+const db = require('../db');
 
-module.exports = products;
+// Obtener todos los productos
+exports.getAllProducts = (callback) => {
+    db.query('SELECT * FROM products', (err, results) => {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, results);
+    });
+};
+
+// Obtener un producto por ID
+exports.getProductById = (id, callback) => {
+    db.query('SELECT * FROM products WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            return callback(err, null);
+        }
+        if (results.length === 0) {
+            return callback(new Error('El producto con el ID proporcionado no fue encontrado'), null);
+        }
+        callback(null, results[0]);
+    });
+};
+
+// Agregar un nuevo producto
+exports.createProduct = (product, callback) => {
+    db.query('INSERT INTO products SET ?', product, (err, results) => {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, { id: results.insertId, ...product });
+    });
+};
+
+// Actualizar un producto existente
+exports.updateProduct = (id, product, callback) => {
+    db.query('UPDATE products SET ? WHERE id = ?', [product, id], (err, results) => {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, { id, ...product });
+    });
+};
+
+// Eliminar un producto
+exports.deleteProduct = (id, callback) => {
+    db.query('DELETE FROM products WHERE id = ?', [id], (err, results) => {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, { id });
+    });
+};

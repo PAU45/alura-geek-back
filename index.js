@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const config = require('./src/utils/config');
 const adminRoutes = require('./src/routes/Admin');
-const productRoutes = require('./src/routes/producto');
+const productRoutes = require('./src/routes/producto'); // Asegúrate de que la ruta de importación sea correcta
 const userRoutes = require('./src/routes/usuario');
 const logger = require('./src/middlewares/logger');
 
@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/admin', adminRoutes);
-app.use('/api/products', productRoutes); // Asegúrate de que esta línea esté presente
+app.use('/api/products', productRoutes);
 app.use('/api/users', userRoutes);
 
 const port = config.server.port || 3000;

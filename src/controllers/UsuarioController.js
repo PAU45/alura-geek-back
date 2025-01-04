@@ -1,4 +1,4 @@
-const users = require('../models/usuarios');
+const users = require('../models/Usuarios');
 
 // Registrar un nuevo usuario
 exports.registerUser = (req, res) => {

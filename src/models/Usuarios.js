@@ -1,23 +1,30 @@
 const db = require('../db');
+const bcrypt = require('bcryptjs');
 
-// Obtener todos los clientes
-exports.getAllCustomers = (callback) => {
-    db.query('SELECT * FROM customers', (err, results) => {
+// Crear un nuevo usuario
+exports.createUser = (user, callback) => {
+    bcrypt.hash(user.password, 10, (err, hashedPassword) => {
         if (err) {
             return callback(err, null);
         }
-        callback(null, results);
+        user.password = hashedPassword;
+        db.query('INSERT INTO users SET ?', user, (err, results) => {
+            if (err) {
+                return callback(err, null);
+            }
+            callback(null, { id: results.insertId, ...user });
+        });
     });
 };
 
-// Obtener un cliente por ID
-exports.getCustomerById = (id, callback) => {
-    db.query('SELECT * FROM customers WHERE id = ?', [id], (err, results) => {
+// Obtener un usuario por email
+exports.getUserByEmail = (email, callback) => {
+    db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
         if (err) {
             return callback(err, null);
         }
         if (results.length === 0) {
-            return callback(new Error('El cliente con el ID proporcionado no fue encontrado'), null);
+            return callback(new Error('Usuario no encontrado'), null);
         }
         callback(null, results[0]);
     });

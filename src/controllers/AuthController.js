@@ -13,6 +13,7 @@ exports.register = (req, res) => {
     const newUser = { nombre, email, password };
     User.createUser(newUser, (err, user) => {
         if (err) {
+            console.error('Error al registrar el usuario:', err);
             return res.status(500).send('Error al registrar el usuario');
         }
         res.send(user);

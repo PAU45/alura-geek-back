@@ -2,12 +2,12 @@ const Category = require('../models/Categoria');
 
 // Crear una nueva categoría
 exports.createCategory = (req, res) => {
-    const { nombre } = req.body;
+    const { nombre, imagen_url } = req.body;
     if (!nombre) {
         return res.status(400).send('El nombre de la categoría es requerido');
     }
 
-    const newCategory = { nombre };
+    const newCategory = { nombre, imagen_url };
     Category.createCategory(newCategory, (err, category) => {
         if (err) {
             return res.status(500).send('Error al crear la categoría');
@@ -40,8 +40,8 @@ exports.getCategoryById = (req, res) => {
 // Actualizar una categoría existente
 exports.updateCategory = (req, res) => {
     const categoryId = parseInt(req.params.id);
-    const { nombre } = req.body;
-    const updatedCategory = { nombre };
+    const { nombre, imagen_url } = req.body;
+    const updatedCategory = { nombre, imagen_url };
 
     Category.updateCategory(categoryId, updatedCategory, (err, category) => {
         if (err) {

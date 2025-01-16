@@ -1,13 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const productController = require('../controllers/TiendaController');
-const authenticateToken = require('../middlewares/auth'); // Importar el middleware de autenticación
+const authenticateToken = require('../middlewares/auth');
 
-// Rutas para productos
+// Rutas específicas primero
+router.get('/best', productController.getBestDiscountedProducts);
+router.get('/top', productController.getTopProducts);
+
+// Rutas generales después
 router.get('/', productController.getAllProducts);
 router.get('/:id', productController.getProductById);
-router.post('/', authenticateToken, productController.createProduct); // Proteger la ruta
-router.put('/:id', authenticateToken, productController.updateProduct); // Proteger la ruta
-router.delete('/:id', authenticateToken, productController.deleteProduct); // Proteger la ruta
+
+// Rutas protegidas
+router.post('/', authenticateToken, productController.createProduct);
+router.put('/:id', authenticateToken, productController.updateProduct);
+router.delete('/:id', authenticateToken, productController.deleteProduct);
 
 module.exports = router;

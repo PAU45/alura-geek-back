@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/AuthController');
+const userController = require('../controllers/UsuarioController');
+const authenticateToken = require('../middlewares/auth'); // Importar el middleware de autenticación
 
-// Rutas de autenticación
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+// Rutas para usuarios
+router.get('/me', authenticateToken, userController.getAuthenticatedUser);
+router.post('/register', userController.registerUser);
+router.post('/login', userController.loginUser);
+router.get('/:id', userController.getUserById);
 
 module.exports = router;

@@ -1,42 +1,71 @@
-const users = require('../models/Usuarios');
+const User = require('../models/Usuarios');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const config = require('../utils/config');
 
-// Registrar un nuevo usuario
-exports.registerUser = (req, res) => {
-    const { username, password, email } = req.body;
-    if (!username || !password || !email) {
-        res.status(400).send('Username, password, and email are required');
-        return;
+exports.registerUser = async (req, res) => {
+    const { nombre, password, email } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = { nombre, password: hashedPassword, email };
+
+        User.createUser(newUser, (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: 'Error al registrar el usuario' });
+            }
+            res.status(201).json({ message: 'Usuario registrado exitosamente', userId: result.id });
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al registrar el usuario' });
     }
-
-    const newUser = {
-        id: users.length + 1,
-        username,
-        password,
-        email
-    };
-
-    users.push(newUser);
-    res.send(newUser);
 };
 
-// Iniciar sesión de un usuario
 exports.loginUser = (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) {
-        res.status(401).send('Invalid username or password');
-        return;
-    }
+    const { email, password } = req.body;
 
-    res.send(user);
+    User.getUserByEmail(email, async (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error al iniciar sesión' });
+        }
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
+
+        const token = jwt.sign({ userId: user.id }, config.jwtSecret,{ expiresIn: '1h' });
+        res.json({ message: 'Inicio de sesión exitoso', token });
+    });
 };
 
-// Obtener un usuario por ID
+exports.getAuthenticatedUser = (req, res) => {
+    const userId = req.user.userId; // Obtener el userId del token JWT
+
+    User.findById(userId, (err, user) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error al obtener la información del usuario' });
+        }
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.json({ id: user.id, nombre: user.nombre, email: user.email });
+    });
+};
+
 exports.getUserById = (req, res) => {
-    const user = users.find(u => u.id === parseInt(req.params.id));
-    if (!user) {
-        res.status(404).send('User not found');
-        return;
-    }
-    res.send(user);
+    const userId = req.params.id;
+
+    User.findById(userId, (err, user) => {
+        if (err) {
+            return res.status(500).json({ message: 'Error al obtener la información del usuario' });
+        }
+        if (!user) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
+        }
+        res.json({ id: user.id, nombre: user.nombre, email: user.email });
+    });
 };

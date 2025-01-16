@@ -29,3 +29,19 @@ exports.getUserByEmail = (email, callback) => {
         callback(null, results[0]);
     });
 };
+
+// Obtener un usuario por ID
+exports.findById = (id, callback) => {
+    db.query('SELECT id, nombre, email FROM users WHERE id = ?', [id], (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0]);
+    });
+};
+
+// Obtener un usuario por nombre de usuario
+exports.findByUsername = (username, callback) => {
+    db.query('SELECT * FROM users WHERE nombre = ?', [username], (err, results) => {
+        if (err) return callback(err);
+        callback(null, results[0]);
+    });
+};

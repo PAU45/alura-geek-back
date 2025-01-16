@@ -1,5 +1,4 @@
-const db = require('../db');
-
+const db = require('/home/paulin/Documents/api/src/db.js');
 // Obtener todos los productos
 exports.getAllProducts = (callback) => {
     db.query('SELECT * FROM products', (err, results) => {
@@ -50,5 +49,36 @@ exports.deleteProduct = (id, callback) => {
             return callback(err, null);
         }
         callback(null, { id });
+    });
+};
+
+// Obtener los mejores productos
+exports.getTopProducts = (limit, callback) => {
+    db.query('SELECT * FROM products ORDER BY rating DESC LIMIT ?', [limit], (err, results) => {
+        if (err) {
+            return callback(err, null);
+        }
+        callback(null, results);
+    });
+};
+
+
+
+// ...existing code...
+
+
+
+exports.getBestDiscountedProducts = (callback) => {
+    const query = `
+        SELECT *,
+            price * (1 - discount/100) as final_price,
+            price * (discount/100) as savings
+        FROM products 
+        WHERE discount > 0 
+        ORDER BY discount DESC`;
+        
+    db.query(query, (err, results) => {
+        if (err) return callback(err);
+        callback(null, results);
     });
 };
